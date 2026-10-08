@@ -347,3 +347,16 @@ h1 span { color: #2186e7; }
   object-fit: contain;
   border-radius: 6px;
 }
+
+/* Job Board header title */
+.board-label {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+@media (max-width: 760px) {
+  .board-label {
+    font-size: 20px;
+  }
+}
