@@ -18,9 +18,51 @@ const SAVE_KEY = "languify-saved-jobs-v1";
 const PAGE_SIZE = 6;
 const companyColors: Record<string, string> = { Razorpay: "blue", Deloitte: "black", Swiggy: "orange", Groww: "green", Meesho: "pink", Freshworks: "teal", PhonePe: "purple", "Bain & Company": "red", "Urban Company": "black", CRED: "black", Postman: "orange", Zomato: "red" };
 
-function CompanyMark({ company }: { company: string }) {
-  const initials = company === "Razorpay" ? "R" : company === "Deloitte" ? "D." : company.split(/\s+/).slice(0, 2).map(p => p[0]).join("");
-  return <span className={`company-mark mark-${companyColors[company] || "blue"}`} aria-hidden="true">{initials}</span>;
+function CompanyMark({
+  company,
+  logo,
+}: {
+  company: string;
+  logo?: string | null;
+}) {
+  const [failedLogo, setFailedLogo] = useState<string | null>(null);
+  const imageUrl = logo && logo !== failedLogo ? logo : null;
+
+  const initials =
+    company === "Razorpay"
+      ? "R"
+      : company === "Deloitte"
+        ? "D."
+        : company
+            .split(/\s+/)
+            .slice(0, 2)
+            .map((part) => part[0])
+            .join("");
+
+  return (
+    <span
+      className={`company-mark ${
+        imageUrl ? "mark-logo" : `mark-${companyColors[company] || "blue"}`
+      }`}
+      aria-hidden="true"
+    >
+      {imageUrl ? (
+        <img
+          key={imageUrl}
+          src={imageUrl}
+          alt=""
+          width={48}
+          height={48}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setFailedLogo(imageUrl)}
+        />
+      ) : (
+        initials
+      )}
+    </span>
+  );
 }
 function timeLabel(value: string | null) {
   if (!value) return "Update time unavailable";
@@ -161,7 +203,7 @@ export default function JobBoard({ initialFeed }: { initialFeed: JobFeed }) {
             <div className={`jobs-grid ${layout === "list" ? "list-layout" : ""}`} aria-live="polite" aria-busy={refreshing}>
               {visibleJobs.map(job => <article className="job-card" key={job.id}>
                 <div className="card-top">
-                  <CompanyMark company={job.company} />
+                  <CompanyMark company={job.company} logo={job.companyLogo} />
                   <div className="company-info"><span>{job.company}</span><span className="posted-date">{job.demo ? <><Info size={12} aria-hidden="true" />Sample listing</> : <><Clock3 size={12} aria-hidden="true" />{relativeDate(job.postedAt, now)}</>}</span></div>
                   <button className={`bookmark-button ${saved.includes(job.id) ? "is-saved" : ""}`} aria-label={`${saved.includes(job.id) ? "Unsave" : "Save"} ${job.title} at ${job.company}`} aria-pressed={saved.includes(job.id)} onClick={() => toggleSave(job)}><Bookmark size={19} fill={saved.includes(job.id) ? "currentColor" : "none"} /></button>
                 </div>
@@ -189,7 +231,7 @@ export default function JobBoard({ initialFeed }: { initialFeed: JobFeed }) {
       </div>
     </main>
     <Sheet open={mobileFilters} onOpenChange={setMobileFilters}><SheetContent side="left" className="mobile-filter-sheet"><SheetHeader><SheetTitle>Refine your search</SheetTitle><SheetDescription>Choose the roles and working style that fit you.</SheetDescription></SheetHeader><div className="mobile-filter-content">{filterContent}</div><Button className="mobile-show-results" onClick={() => setMobileFilters(false)}>Show {filtered.length} jobs</Button></SheetContent></Sheet>
-    <Sheet open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}><SheetContent className="job-detail-sheet">{selected && <><SheetHeader className="detail-heading"><CompanyMark company={selected.company} /><span className="detail-company">{selected.company}</span><SheetTitle className="detail-title">{selected.title}</SheetTitle><SheetDescription>{selected.location} · {selected.workMode}</SheetDescription></SheetHeader><div className="detail-body">{selected.demo && <div className="sample-disclaimer"><Info size={17} /><span>This is a sample listing. Applications are unavailable.</span></div>}<div className="detail-facts"><div><BriefcaseBusiness size={17} /><span>Job type<strong>{selected.employmentType}</strong></span></div><div><GraduationCap size={19} /><span>Experience<strong>{selected.experience}</strong></span></div><div><Building2 size={17} /><span>Work arrangement<strong>{selected.workMode}</strong></span></div><div><Globe2 size={17} /><span>Compensation<strong>{selected.salary || "Not disclosed"}</strong></span></div></div><h3>About the role</h3><p className="job-description">{selected.description}</p>{selected.skills.length > 0 && <><h3>Skills</h3><div className="detail-skills">{selected.skills.map(skill => <span key={skill}>{skill}</span>)}</div></>}<p className="source-note">{selected.demo ? "All details shown are illustrative." : `Posted ${relativeDate(selected.postedAt, now).toLowerCase()} · Source: ${selected.source}. Confirm availability and details on the original posting.`}</p></div><div className="detail-actions"><Button variant="outline" onClick={() => toggleSave(selected)}><Bookmark size={17} fill={saved.includes(selected.id) ? "currentColor" : "none"} />{saved.includes(selected.id) ? "Saved" : "Save job"}</Button>{selected.url && !selected.demo ? <Button asChild><a href={selected.url} target="_blank" rel="noopener noreferrer">Apply on source<ExternalLink size={16} /></a></Button> : <Button disabled>Sample listing</Button>}</div></>}</SheetContent></Sheet>
+    <Sheet open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}><SheetContent className="job-detail-sheet">{selected && <><SheetHeader className="detail-heading"><CompanyMark company={selected.company} logo={selected.companyLogo} /><span className="detail-company">{selected.company}</span><SheetTitle className="detail-title">{selected.title}</SheetTitle><SheetDescription>{selected.location} · {selected.workMode}</SheetDescription></SheetHeader><div className="detail-body">{selected.demo && <div className="sample-disclaimer"><Info size={17} /><span>This is a sample listing. Applications are unavailable.</span></div>}<div className="detail-facts"><div><BriefcaseBusiness size={17} /><span>Job type<strong>{selected.employmentType}</strong></span></div><div><GraduationCap size={19} /><span>Experience<strong>{selected.experience}</strong></span></div><div><Building2 size={17} /><span>Work arrangement<strong>{selected.workMode}</strong></span></div><div><Globe2 size={17} /><span>Compensation<strong>{selected.salary || "Not disclosed"}</strong></span></div></div><h3>About the role</h3><p className="job-description">{selected.description}</p>{selected.skills.length > 0 && <><h3>Skills</h3><div className="detail-skills">{selected.skills.map(skill => <span key={skill}>{skill}</span>)}</div></>}<p className="source-note">{selected.demo ? "All details shown are illustrative." : `Posted ${relativeDate(selected.postedAt, now).toLowerCase()} · Source: ${selected.source}. Confirm availability and details on the original posting.`}</p></div><div className="detail-actions"><Button variant="outline" onClick={() => toggleSave(selected)}><Bookmark size={17} fill={saved.includes(selected.id) ? "currentColor" : "none"} />{saved.includes(selected.id) ? "Saved" : "Save job"}</Button>{selected.url && !selected.demo ? <Button asChild><a href={selected.url} target="_blank" rel="noopener noreferrer">Apply on source<ExternalLink size={16} /></a></Button> : <Button disabled>Sample listing</Button>}</div></>}</SheetContent></Sheet>
     <Toaster theme="light" position="bottom-center" closeButton toastOptions={{ duration: 4000 }} />
   </Tabs>;
 }
