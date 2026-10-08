@@ -360,3 +360,107 @@ h1 span { color: #2186e7; }
     font-size: 20px;
   }
 }
+
+/* Paste once at the end of app/globals.css. */
+:root {
+  --brand: #003E8C;
+  --brand-hover: #00316F;
+  --brand-soft: #EFF4FA;
+  --brand-border: #B8CBE3;
+  --primary: var(--brand);
+  --primary-foreground: #fff;
+  --secondary: var(--brand-soft);
+  --secondary-foreground: var(--brand);
+  --accent: var(--brand-soft);
+  --accent-foreground: var(--brand);
+  --ring: var(--brand);
+  --sidebar-primary: var(--brand);
+  --sidebar-accent: var(--brand-soft);
+  --sidebar-accent-foreground: var(--brand);
+  --sidebar-ring: var(--brand);
+}
+
+.board-label { font-size: 24px; font-weight: 600; line-height: 1.2; }
+
+.board-label,
+.discovery h1 span,
+.header-tabs [data-slot="tabs-trigger"][data-state="active"],
+.filter-heading svg,
+.text-button,
+.search-field:focus-within,
+.quick-searches button:hover,
+.filter-option:hover,
+.filter-option:has([data-state="checked"]),
+.filter-option:has([data-state="checked"]) .filter-number,
+.nav-count,
+.result-count,
+.count-pill,
+.active-filters > span,
+.view-toggle button[aria-pressed="true"],
+.bookmark-button:hover,
+.bookmark-button.is-saved,
+.job-title > button:hover,
+.details-button,
+.details-button:hover,
+.feed-note > button:hover,
+.company-mark.mark-blue,
+.detail-skills span {
+  color: var(--brand);
+}
+
+.header-tabs [data-slot="tabs-trigger"]::after,
+.eyebrow-line,
+.search-button {
+  background: var(--brand);
+}
+.search-button { color: #fff; box-shadow: 0 1px 2px #003E8C1A; }
+.search-button:hover { background: var(--brand-hover); }
+
+.nav-count,
+.result-count,
+.count-pill,
+.active-filters > span,
+.input-clear:hover,
+.quick-searches button:hover,
+.filter-option:hover,
+.filter-option:has([data-state="checked"]),
+.view-toggle button[aria-pressed="true"],
+.bookmark-button:hover,
+.bookmark-button.is-saved,
+.details-button:hover,
+.company-mark.mark-blue,
+.detail-skills span {
+  background: var(--brand-soft);
+}
+.filter-option:has([data-state="checked"]) .filter-number {
+  background: #DDE7F3;
+}
+
+.search-bar,
+.location-field,
+.filter-option:hover,
+.filter-option:has([data-state="checked"]),
+.bookmark-button:hover,
+.bookmark-button.is-saved,
+.details-button,
+.details-button:hover,
+.company-mark.mark-blue {
+  border-color: var(--brand-border);
+}
+.search-bar:hover,
+.search-bar:focus-within,
+.filter-option [data-slot="checkbox"][data-state="checked"] {
+  border-color: var(--brand);
+}
+.search-bar:focus-within { box-shadow: 0 0 0 3px #003E8C14; }
+.filter-option [data-slot="checkbox"][data-state="checked"] {
+  background: var(--brand);
+  color: #fff;
+}
+:focus-visible { outline-color: var(--brand); }
+::selection { background: #DDE7F3; color: #003E8C; }
+
+@media (max-width: 760px) {
+  .board-label { font-size: 20px; }
+}
+
