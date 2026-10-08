@@ -2,6 +2,7 @@ export const ROLES = ["Product", "Consulting", "Growth", "Business", "Design", "
 export type Role = (typeof ROLES)[number];
 export type Job = {
   id: string; title: string; company: string; location: string; workMode: string;
+  companyLogo?: string | null;
   employmentType: string; experience: string; role: Role; salary: string | null;
   description: string; skills: string[]; postedAt: string | null;
   url: string | null; listingUrl: string | null; source: string; demo: boolean;
@@ -38,6 +39,12 @@ export function safeUrl(value: unknown): string | null {
     for (const key of [...url.searchParams.keys()]) if (/^(utm_|trk|trackingId|refId)/i.test(key)) url.searchParams.delete(key);
     return url.toString();
   } catch { return null; }
+}
+function companyLogoUrl(value: unknown): string | null {
+  if (typeof value !== "string" || !safeUrl(value)) return null;
+
+  // Preserve the original image URL, including its signed parameters.
+  return new URL(value).protocol === "https:" ? value.trim() : null;
 }
 export function absoluteDate(value: unknown): string | null {
   // Relative dates must not move forward every time the feed refreshes.
@@ -131,6 +138,7 @@ export function normalizeJob(input: unknown, now = Date.now()): Job | null {
   const source = /(^|\.)linkedin\.com$/.test(host) ? "LinkedIn" : /(^|\.)naukri\.com$/.test(host) ? "Naukri" : /(^|\.)indeed\.com$/.test(host) ? "Indeed" : host;
   return {
     id: jobIdentity(listingUrl || url), title, company, location, workMode, employmentType, experience,
+    companyLogo: companyLogoUrl(row.companyLogo),
     role: inferRole(title, pick(row, ["category", "department", "roleCategory"])), salary: salaryText(row),
     description: pick(row, ["descriptionText", "description", "jobDescription", "descriptionHtml"], 15000) || "See the original job posting for the full description and application requirements.",
     skills, postedAt: pickDate(row, ["postedAtTimestamp", "postedAt", "publishedAt", "publishedDate", "datePosted", "postedTime"]),
